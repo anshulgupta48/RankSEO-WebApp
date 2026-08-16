@@ -1,0 +1,89 @@
+{
+  "projectId": "bb083f99-aa32-4c40-959d-0482015277d3",
+  "type": "frontend",
+  "name": "RankSEO email and password authentication",
+  "description": "Verify RankSEO sign-up, sign-in, logout, authenticated public-route redirects, and unauthenticated dashboard protection using the visible browser experience.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Start with a clean signed-out browser session and navigate to /auth/sign-up."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the sign-up page shows the shared RankSEO header, the heading \"Create your RankSEO account\", Name, Email, and Password fields, a \"Create account\" button, and a link to sign in."
+    },
+    {
+      "type": "action",
+      "description": "Submit the sign-up form with every field empty."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify inline validation prevents submission and reports that a name, valid email address, and password of at least 8 characters are required."
+    },
+    {
+      "type": "action",
+      "description": "Enter a one-character name, an invalid email address, and a password shorter than 8 characters, then submit again."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the form stays on /auth/sign-up and displays the relevant inline validation messages next to the invalid fields."
+    },
+    {
+      "type": "action",
+      "description": "Create a unique test email address for this run, remember it with the password \"RankSEO-Test-2026!\", enter a valid full name, that email, and the password, then submit the form."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify account creation succeeds, the browser is redirected to /ai-keyword, and the authenticated AI Keyword Research page displays its heading and \"Log out\" button."
+    },
+    {
+      "type": "action",
+      "description": "While still authenticated, navigate directly to /."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the authenticated visitor is redirected from the landing page to /ai-keyword."
+    },
+    {
+      "type": "action",
+      "description": "While still authenticated, navigate directly to /auth/sign-in."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the authenticated visitor is redirected from the auth route to /ai-keyword."
+    },
+    {
+      "type": "action",
+      "description": "Click the \"Log out\" button on the AI Keyword Research page."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify logout succeeds, the browser is redirected to /auth/sign-in, and the \"Welcome back\" sign-in form is visible."
+    },
+    {
+      "type": "action",
+      "description": "While signed out, navigate directly to /ai-keyword."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the protected dashboard route redirects the signed-out visitor to /auth/sign-in."
+    },
+    {
+      "type": "action",
+      "description": "Enter the remembered unique test email with an incorrect password and submit the sign-in form."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify sign-in is rejected, an error notification is shown, and the browser remains on /auth/sign-in without exposing protected dashboard content."
+    },
+    {
+      "type": "action",
+      "description": "Replace the password with the remembered valid password \"RankSEO-Test-2026!\" and submit the sign-in form."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify sign-in succeeds, the browser returns to /ai-keyword, and the authenticated page displays the \"Log out\" button."
+    }
+  ]
+}
