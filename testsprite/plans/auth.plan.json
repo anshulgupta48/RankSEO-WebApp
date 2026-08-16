@@ -1,8 +1,8 @@
 {
-  "projectId": "bb083f99-aa32-4c40-959d-0482015277d3",
+  "projectId": "9e2c5bb6-3fed-403d-ad80-877c65de5515",
   "type": "frontend",
   "name": "RankSEO email and password authentication",
-  "description": "Verify RankSEO sign-up, sign-in, logout, authenticated public-route redirects, and unauthenticated dashboard protection using the visible browser experience.",
+  "description": "Verify RankSEO sign-up, sign-in, logout, authenticated public-route redirects, and unauthenticated dashboard protection using the visible browser experience. Authentication implementation details and internal API endpoints should not be assumed.",
   "priority": "p0",
   "planSteps": [
     {
@@ -11,7 +11,7 @@
     },
     {
       "type": "assertion",
-      "description": "Verify the sign-up page shows the shared RankSEO header, the heading \"Create your RankSEO account\", Name, Email, and Password fields, a \"Create account\" button, and a link to sign in."
+      "description": "Verify the sign-up page shows the shared RankSEO header, the heading 'Create your RankSEO account', Name, Email, and Password fields, a 'Create account' button, and a link to sign in."
     },
     {
       "type": "action",
@@ -31,11 +31,11 @@
     },
     {
       "type": "action",
-      "description": "Create a unique test email address for this run, remember it with the password \"RankSEO-Test-2026!\", enter a valid full name, that email, and the password, then submit the form."
+      "description": "Create a unique test email address for this run, remember it with the password 'RankSEO-Test-2026!', enter a valid full name, that email, and the password, then submit the form."
     },
     {
       "type": "assertion",
-      "description": "Verify account creation succeeds, the browser is redirected to /ai-keyword, and the authenticated AI Keyword Research page displays its heading and \"Log out\" button."
+      "description": "Verify account creation succeeds, the browser is redirected to /ai-keyword, and the authenticated AI Keyword Research page displays its heading and a visible user avatar in the top-right corner with the authenticated user's initials."
     },
     {
       "type": "action",
@@ -55,11 +55,19 @@
     },
     {
       "type": "action",
-      "description": "Click the \"Log out\" button on the AI Keyword Research page."
+      "description": "On the authenticated AI Keyword Research page, click the circular user avatar in the top-right corner of the header. The avatar displays the authenticated user's initials and has the accessible label 'Open user menu'."
     },
     {
       "type": "assertion",
-      "description": "Verify logout succeeds, the browser is redirected to /auth/sign-in, and the \"Welcome back\" sign-in form is visible."
+      "description": "Verify the user menu opens and displays the authenticated user's name and email, a 'Dark mode' control, and a visible 'Log out' menu item."
+    },
+    {
+      "type": "action",
+      "description": "Click the visible 'Log out' menu item in the opened user menu. Do not directly navigate to or assume any authentication API endpoint."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify logout succeeds, the authenticated session is cleared, the browser is redirected to /auth/sign-in, and the 'Welcome back' sign-in form is visible."
     },
     {
       "type": "action",
@@ -79,11 +87,11 @@
     },
     {
       "type": "action",
-      "description": "Replace the password with the remembered valid password \"RankSEO-Test-2026!\" and submit the sign-in form."
+      "description": "Replace the password with the remembered valid password 'RankSEO-Test-2026!' and submit the sign-in form."
     },
     {
       "type": "assertion",
-      "description": "Verify sign-in succeeds, the browser returns to /ai-keyword, and the authenticated page displays the \"Log out\" button."
+      "description": "Verify sign-in succeeds, the browser returns to /ai-keyword, and the authenticated page displays the user's initials in the top-right avatar, which provides access to the 'Log out' action."
     }
   ]
 }
