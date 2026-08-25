@@ -25,6 +25,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  reports       Report[]
 
   stripeCustomerId String?
 
@@ -78,4 +79,51 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+enum ReportType {
+  KEYWORD
+  VISIBILITY
+}
+
+enum ReportStatus {
+  PENDING
+  COLLECTING
+  ANALYZING
+  COMPLETED
+  FAILED
+}
+
+model Report {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type   ReportType
+  status ReportStatus @default(PENDING)
+
+  // AI Keyword Research input
+  keyword  String?
+  language String?
+  country  String?
+
+  // AI Search Visibility input
+  website String?
+  brand   String?
+  topic   String?
+
+  progress            Int       @default(0)
+  currentStep         String?
+  triggerRunId        String?
+  brightDataSnapshots String[]  @default([])
+  result              Json?
+  errorMessage        String?
+  completedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([userId, type, status])
+  @@index([triggerRunId])
+  @@map("report")
 }
