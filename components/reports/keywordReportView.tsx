@@ -10,7 +10,7 @@ type KeywordReportViewProps = {
 };
 
 export function KeywordReportView({ keyword, report }: KeywordReportViewProps) {
-  const premiumLocked = true;
+  const premiumLocked = false;
 
   return (
     <div className='flex flex-col gap-8 pb-8'>

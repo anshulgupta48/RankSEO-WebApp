@@ -1,4 +1,6 @@
 'use client';
+import { useCallback, useState } from 'react';
+import { useRealtimeRun } from '@trigger.dev/react-hooks';
 import { CheckIcon, CircleIcon, LoaderCircleIcon } from 'lucide-react';
 import {
   Card,
@@ -8,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import type { KeywordReport } from '@/lib/keyword-report';
+import type { keywordResearchTask } from '@/trigger/keyword-research';
 import type { KeywordResearchResponse } from '@/types/keyword-research';
 
 const keywordSteps = [
@@ -31,36 +34,94 @@ type LiveReportProgressProps = {
 };
 
 export function LiveReportProgress({
+  accessToken,
   initialProgress,
   keyword,
+  onComplete,
+  runId,
 }: LiveReportProgressProps) {
-  const run = {
-    metadata: {
-      progress: 40,
-      currentStep: 'Collecting research sources',
-    },
-  };
+  const initialStepIndex = Math.max(
+    0,
+    keywordSteps.findIndex((step) => step === initialProgress.currentStep),
+  );
 
-  const error = {
-    message: 'The live report connection was interrupted. Please try again.',
-  };
+  const [maxStepIndex, setMaxStepIndex] = useState(initialStepIndex);
+  const [maxProgress, setMaxProgress] = useState(
+    Math.min(100, Math.max(0, initialProgress.progress ?? 0)),
+  );
+
+  const handleRunComplete = useCallback(
+    (
+      completedRun: {
+        status: string;
+        output?: unknown;
+      },
+      subscriptionError?: Error,
+    ) => {
+      const output = completedRun.output as
+        | { report?: KeywordReport | null }
+        | undefined;
+
+      const result = output?.report ?? null;
+      const succeeded =
+        completedRun.status === 'COMPLETED' &&
+        !subscriptionError &&
+        result !== null;
+
+      const errorMessage = succeeded
+        ? undefined
+        : (subscriptionError?.message ??
+          ('error' in completedRun &&
+          completedRun.error &&
+          typeof completedRun.error === 'object' &&
+          'message' in completedRun.error &&
+          typeof completedRun.error.message === 'string'
+            ? completedRun.error.message
+            : 'The research run finished without a report result.'));
+
+      onComplete(result, succeeded, errorMessage);
+    },
+    [onComplete],
+  );
+
+  const { run, error } = useRealtimeRun<typeof keywordResearchTask>(runId, {
+    accessToken,
+    enabled: Boolean(runId && accessToken),
+    onComplete: handleRunComplete,
+    skipColumns: ['payload'],
+  });
 
   const metadataProgress = run?.metadata?.progress;
   const metadataStep = run?.metadata?.currentStep;
-  const progress =
-    typeof metadataProgress === 'number'
-      ? metadataProgress
-      : initialProgress.progress;
 
-  const currentStep =
+  const receivedStepIndex =
     typeof metadataStep === 'string'
-      ? metadataStep
-      : initialProgress.currentStep;
-  const safeProgress = Math.min(100, Math.max(0, progress));
-  const matchedStepIndex = keywordSteps.findIndex(
-    (step) => step === currentStep,
-  );
-  const activeStepIndex = Math.max(0, matchedStepIndex);
+      ? keywordSteps.findIndex((step) => step === metadataStep)
+      : -1;
+  const currentStepIndex = Math.max(maxStepIndex, receivedStepIndex);
+
+  const receivedProgress =
+    typeof metadataProgress === 'number'
+      ? Math.min(100, Math.max(0, metadataProgress))
+      : 0;
+  const currentProgress = Math.max(maxProgress, receivedProgress);
+
+  if (currentStepIndex > maxStepIndex) {
+    queueMicrotask(() => {
+      setMaxStepIndex((previous) => Math.max(previous, currentStepIndex));
+    });
+  }
+
+  if (currentProgress > maxProgress) {
+    queueMicrotask(() => {
+      setMaxProgress((previous) => Math.max(previous, currentProgress));
+    });
+  }
+
+  const activeStepIndex = currentStepIndex;
+  const currentStep =
+    keywordSteps[activeStepIndex] ?? initialProgress.currentStep;
+  const safeProgress = currentProgress;
 
   return (
     <Card
@@ -72,6 +133,7 @@ export function LiveReportProgress({
         <CardTitle className='text-2xl font-semibold tracking-tight normal-case'>
           Generating your report
         </CardTitle>
+
         <CardDescription className='text-base'>
           You can leave this page. RankSEO will keep processing the report.
         </CardDescription>
@@ -91,6 +153,7 @@ export function LiveReportProgress({
         <div className='flex flex-col gap-2.5'>
           <div className='flex items-center justify-between gap-4 text-sm'>
             <span className='font-semibold'>{currentStep}</span>
+
             <span className='font-semibold tabular-nums'>{safeProgress}%</span>
           </div>
 
@@ -104,7 +167,9 @@ export function LiveReportProgress({
           >
             <div
               className='h-full rounded-full bg-primary transition-[width] duration-500'
-              style={{ width: `${safeProgress}%` }}
+              style={{
+                width: `${safeProgress}%`,
+              }}
             />
           </div>
         </div>
