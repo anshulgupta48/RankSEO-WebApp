@@ -30,6 +30,9 @@ const AIKeyword = () => {
         keywordSearches: {
           remaining: 5,
         },
+        visibilityScans: {
+          remaining: 5,
+        },
       },
       isPaid: true,
     },

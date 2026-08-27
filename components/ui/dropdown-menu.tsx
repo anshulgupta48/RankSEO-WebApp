@@ -5,15 +5,27 @@ import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 import { cn } from '@/lib/utils';
 
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
-  return <MenuPrimitive.Root data-slot='dropdown-menu' {...props} />;
+  return (
+    <MenuPrimitive.Group>
+      <MenuPrimitive.Root data-slot='dropdown-menu' {...props} />
+    </MenuPrimitive.Group>
+  );
 }
 
 function DropdownMenuPortal({ ...props }: MenuPrimitive.Portal.Props) {
-  return <MenuPrimitive.Portal data-slot='dropdown-menu-portal' {...props} />;
+  return (
+    <MenuPrimitive.Group>
+      <MenuPrimitive.Portal data-slot='dropdown-menu-portal' {...props} />
+    </MenuPrimitive.Group>
+  );
 }
 
 function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
-  return <MenuPrimitive.Trigger data-slot='dropdown-menu-trigger' {...props} />;
+  return (
+    <MenuPrimitive.Group>
+      <MenuPrimitive.Trigger data-slot='dropdown-menu-trigger' {...props} />
+    </MenuPrimitive.Group>
+  );
 }
 
 function DropdownMenuContent({
