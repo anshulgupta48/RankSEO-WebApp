@@ -22,6 +22,7 @@ import {
 import { cn } from '@/lib/utils';
 import type { VisibilityReportResult } from '@/types/search-visibility';
 import { VisibilitySearchValues } from '@/lib/search-visibility-schema';
+import { useBilling } from '@/hooks/use-billing';
 
 type VisibilityResultsProps = {
   report: VisibilityReportResult;
@@ -59,20 +60,7 @@ const getVisibilityScoreTone = (score: number) => {
 };
 
 export function VisibilityResults({ report, search }: VisibilityResultsProps) {
-  const billing = {
-    data: {
-      usage: {
-        keywordSearches: {
-          remaining: 5,
-        },
-        visibilityScans: {
-          remaining: 5,
-        },
-      },
-      isPaid: true,
-    },
-    refetch: () => {},
-  };
+  const billing = useBilling();
   const premiumLocked = billing.data?.isPaid !== true;
   const websiteHost = new URL(search.website).hostname.replace(/^www\./, '');
   const overallTone = getVisibilityScoreTone(report.overallScore);

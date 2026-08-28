@@ -127,3 +127,27 @@ model Report {
   @@index([triggerRunId])
   @@map("report")
 }
+
+model Subscription {
+  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+  plan                 String
+  referenceId          String    @db.ObjectId
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  status               String    @default("incomplete")
+  periodStart          DateTime?
+  periodEnd            DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  cancelAtPeriodEnd    Boolean?  @default(false)
+  cancelAt             DateTime?
+  canceledAt           DateTime?
+  endedAt              DateTime?
+  seats                Int?
+  billingInterval      String?
+  stripeScheduleId     String?
+
+  @@index([referenceId])
+  @@index([stripeSubscriptionId])
+  @@map("subscription")
+}

@@ -8,22 +8,10 @@ import { VisibilitySearchForm } from '@/components/ai-search-visibility/visibili
 import type { SearchVisibilityResponse } from '@/types/search-visibility';
 import type { VisibilityReportResult } from '@/types/search-visibility';
 import { VisibilitySearchValues } from '@/lib/search-visibility-schema';
+import { useBilling } from '@/hooks/use-billing';
 
 export default function AiSearchVisibilityPage() {
-  const billing = {
-    data: {
-      usage: {
-        keywordSearches: {
-          remaining: 5,
-        },
-        visibilityScans: {
-          remaining: 5,
-        },
-      },
-      isPaid: true,
-    },
-    refetch: () => {},
-  };
+  const billing = useBilling();
   const [submittedSearch, setSubmittedSearch] =
     useState<VisibilitySearchValues | null>(null);
   const [searchResponse, setSearchResponse] =

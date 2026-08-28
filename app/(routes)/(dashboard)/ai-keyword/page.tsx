@@ -12,6 +12,7 @@ import { KeywordReportView } from '@/components/reports/keywordReportView';
 import { ReportFailed } from '@/components/reports/reportFailed';
 import { LiveReportProgress } from '@/components/reports/liveReportProgress';
 import { KeywordResearchResponse } from '@/types/keyword-research';
+import { useBilling } from '@/hooks/use-billing';
 
 const AIKeyword = () => {
   const [submittedKeyword, setSubmittedKeyword] = useState<string | null>(null);
@@ -23,21 +24,7 @@ const AIKeyword = () => {
     useState<KeywordSearchValues | null>(null);
   const [researchResponse, setResearchResponse] =
     useState<KeywordResearchResponse | null>(null);
-
-  const billing = {
-    data: {
-      usage: {
-        keywordSearches: {
-          remaining: 5,
-        },
-        visibilityScans: {
-          remaining: 5,
-        },
-      },
-      isPaid: true,
-    },
-    refetch: () => {},
-  };
+  const billing = useBilling();
 
   const startKeywordResearch = async (input: {
     keyword: string;
