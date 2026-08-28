@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'RankSEO — AI Keyword & Brand Visibility Research',
+  title: 'RankSEO - AI Keyword & Brand Visibility Research',
   description:
     'Find SEO keyword opportunities and understand how ChatGPT and Gemini mention your brand.',
 };

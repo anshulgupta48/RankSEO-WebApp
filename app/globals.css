@@ -172,6 +172,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .landing-marquee {
   animation: landing-marquee 28s linear infinite;
   will-change: transform;

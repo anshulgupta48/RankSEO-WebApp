@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOutIcon, MenuIcon, MoonIcon } from 'lucide-react';
+import { GaugeIcon, LogOutIcon, MenuIcon, MoonIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import { Logo } from '@/components/logo';
@@ -16,9 +16,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Badge } from './ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
+import { authClient } from '@/lib/auth-client';
+import { useBilling } from '@/hooks/use-billing';
 
 const navigationItems = [
   { title: 'AI Keyword Research', href: '/ai-keyword' },
@@ -36,6 +38,7 @@ type DashboardUser = {
 export function DashboardNavbar({ user }: { user: DashboardUser }) {
   const pathname = usePathname();
   const router = useRouter();
+  const billing = useBilling();
   const { resolvedTheme, setTheme } = useTheme();
   const initials = user.name
     .split(' ')
@@ -89,7 +92,7 @@ export function DashboardNavbar({ user }: { user: DashboardUser }) {
         </nav>
 
         <div className='ml-auto flex items-center gap-2'>
-          {/* {billing.data && (
+          {billing.data && (
             <Badge
               render={<Link href='/billing' />}
               variant={
@@ -121,7 +124,7 @@ export function DashboardNavbar({ user }: { user: DashboardUser }) {
             >
               Upgrade to Pro
             </Button>
-          )} */}
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger
