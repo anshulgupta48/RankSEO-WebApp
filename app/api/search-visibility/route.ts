@@ -7,6 +7,7 @@ import prisma from '@/lib/prisma';
 import { ReportStatus } from '@/generated/prisma/client';
 import { visibilitySearchSchema } from '@/lib/search-visibility-schema';
 import type { searchVisibilityTask } from '@/trigger/search-visibility';
+import { checkUsageLimit } from '@/lib/billing';
 
 export async function POST(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const usage = { allowed: true };
+  const usage = await checkUsageLimit(session.user.id, 'visibilityScans');
   if (!usage.allowed) {
     return NextResponse.json(
       {
