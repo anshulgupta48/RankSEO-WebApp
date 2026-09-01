@@ -1,0 +1,117 @@
+{
+  "projectId": "9e2c5bb6-3fed-403d-ad80-877c65de5515",
+  "type": "frontend",
+  "name": "RankSEO AI keyword research",
+  "description": "Verify the authenticated AI Keyword Research experience from its landing state through validated search controls, realtime report progress, and the completed evidence-based keyword report.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Start with a clean signed-out browser session, navigate to /auth/sign-up, and create a new account using a unique email address, a valid name, and the password \"RankSEO-Test-2026!\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify account creation succeeds and the browser is redirected to the protected /ai-keyword page."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the initial AI Keyword Research screen shows an \"Enter a keyword\" input, Language and Location selectors, an \"AI Search\" button, and the heading \"AI-powered keyword research\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify Language defaults to English, Location defaults to United States with its flag, and the AI Search button is disabled while the keyword input is empty."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the landing state includes the four benefit cards \"Research AI prompts and responses\", \"Find secret SEO gems\", \"Optimize for search intent\", and \"Master local search\"."
+    },
+    {
+      "type": "action",
+      "description": "Enter the one-character keyword \"a\" without submitting."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the AI Search button remains disabled because the keyword must contain at least two trimmed characters, and verify no progress or report view appears."
+    },
+    {
+      "type": "action",
+      "description": "Configure a temporary browser-level interception for POST /api/keyword-research that returns HTTP 500 with the JSON message \"Deterministic keyword research failure\". Replace the keyword with \"keyword failure test\" and click AI Search."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the terminal failure UI replaces the landing state, shows \"We couldn't finish this report\", displays \"Deterministic keyword research failure\", and provides a \"Retry report\" button."
+    },
+    {
+      "type": "action",
+      "description": "Keep the temporary interception active, click \"Retry report\", and record the intercepted request."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify retry sends another POST /api/keyword-research request with the saved keyword and country, prevents duplicate clicks while retrying, and returns to the failed-report UI after the deterministic 500 response."
+    },
+    {
+      "type": "action",
+      "description": "Remove the temporary POST /api/keyword-research interception so subsequent requests reach the real application API."
+    },
+    {
+      "type": "action",
+      "description": "Replace the keyword with \"content marketing for small businesses\", change Language to Spanish, and change Location to Canada."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the selected language reads Spanish, the selected location reads Canada with its flag, and the AI Search button becomes enabled."
+    },
+    {
+      "type": "action",
+      "description": "Click the AI Search button once."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify duplicate submission is prevented while the request is active: the search action is disabled and displays \"Researching…\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the landing benefit cards are replaced by a live card headed \"Generating your report\" with the message that RankSEO will keep processing if the user leaves the page."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the live report exposes a progress bar between 0 and 100 percent and shows the five stages: Preparing keyword search, Collecting research sources, Reviewing cited sources, Analysing research findings, and Building keyword report."
+    },
+    {
+      "type": "action",
+      "description": "Wait for the keyword research run to reach a terminal state without refreshing or resubmitting the form."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the successful terminal state replaces the live progress card with an AI keyword report headed \"content marketing for small businesses\" and displays \"Overall SEO Score\" with a numeric score from 0 through 100."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify Report overview displays non-negative values for Sources analysed, Unique domains, Competitors found, and Prompt opportunities."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the completed report includes Top sources, AI summary, Source mix, Competitors and peers, Content opportunity, AI prompt opportunities, and Related keyword ideas sections."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the competitor table uses the user-facing columns Mentions, Share, and Strength. If any competitor has zero mentions, verify it shows 0% share and \"Not mentioned\" strength."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the related keyword table uses the columns Keyword, Topic group, Why it matters, and Relevance, and that displayed relevance values are percentages."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the report includes the disclaimer that the result is a directional content score rather than a Google ranking or search-volume metric."
+    },
+    {
+      "type": "action",
+      "description": "Resize the browser viewport to a mobile width of approximately 390 pixels while remaining on the completed report."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the keyword search controls and completed report remain readable without horizontal page overflow, and report cards stack into a single-column mobile layout."
+    }
+  ]
+}

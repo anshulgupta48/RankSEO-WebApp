@@ -1,0 +1,113 @@
+{
+  "projectId": "9e2c5bb6-3fed-403d-ad80-877c65de5515",
+  "type": "frontend",
+  "name": "RankSEO AI search visibility",
+  "description": "Verify the authenticated AI Search Visibility experience from its landing state through form validation, deterministic start failure, realtime ChatGPT and Gemini scan progress, and the completed visibility report.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Start with a clean signed-out browser session, navigate to /auth/sign-up, and create a new account using a unique email address, a valid name, and the password \"RankSEO-Test-2026!\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify account creation succeeds and the authenticated dashboard navigation becomes available."
+    },
+    {
+      "type": "action",
+      "description": "Navigate directly to /ai-search-visibility."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the page displays the \"AI Search Visibility\" badge, the heading beginning \"Check how you rank in\", Website, Your brand, and Topic fields, and a disabled \"Check AI visibility\" button."
+    },
+    {
+      "type": "assertion",
+      "description": "Observe the animated platform name for at least six seconds and verify the visible heading rotates between ChatGPT and Gemini with fade transitions."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the landing state displays the benefit cards \"Track AI mentions\", \"Discover trigger prompts\", and \"Compare competitors\", with an illustration in each card."
+    },
+    {
+      "type": "action",
+      "description": "Expand the \"Which AI platforms are checked?\" item in the Questions answered section."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the expanded answer states that RankSEO checks ChatGPT and Gemini."
+    },
+    {
+      "type": "action",
+      "description": "Enter \"not-a-url\" for Website, \"A\" for Your brand, and \"AI\" for Topic without submitting."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify inline validation displays \"Enter a valid URL\", \"Use 2+ characters\" for the brand, and \"Use 3+ characters\" for the topic, while the Check AI visibility button remains disabled and no progress card appears."
+    },
+    {
+      "type": "action",
+      "description": "Configure a temporary browser-level interception for POST /api/search-visibility that returns HTTP 500 with the JSON message \"Deterministic visibility start failure\". Replace the fields with Website \"https://testsprite.com\", brand \"TestSprite\", and topic \"AI software testing tools for development teams\", then click Check AI visibility."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the landing content is replaced by a destructive alert headed \"We couldn't finish this visibility scan\", the message \"Deterministic visibility start failure\" is visible, and the form is enabled again after the request finishes."
+    },
+    {
+      "type": "action",
+      "description": "Remove the temporary POST /api/search-visibility interception so the next request reaches the real application API."
+    },
+    {
+      "type": "action",
+      "description": "Submit the same valid Website, Your brand, and Topic values once using the real Check AI visibility action."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify duplicate submission is prevented while the request and scan are active: all three fields and the submit button are disabled, and the button displays \"Checking visibility\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the failed alert is replaced by a live card headed \"Checking your AI visibility\" with the message that RankSEO will keep processing if the user leaves the page."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the live card exposes a progress bar between 0 and 100 percent and shows the five stages: Preparing visibility scan, Creating customer prompts, Checking ChatGPT and Gemini, Analysing brand mentions, and Building visibility report."
+    },
+    {
+      "type": "action",
+      "description": "Wait for the real visibility task to reach a terminal state without refreshing or submitting another scan."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify a successful terminal state automatically replaces live progress with a visibility report headed \"TestSprite in AI search\" and identifies the submitted topic and testsprite.com website."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify Visibility overview shows an AI visibility score from 0 through 100 and non-negative values for Brand mentions, Website citations, and Competitors found."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the platform results contain exactly one ChatGPT row and one Gemini row, and each row displays a percentage score, prompts checked, mentions, and citations."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the report says five prompts were checked and Prompt visibility contains five prompt rows, each with a Mentioned or Opportunity status and either ChatGPT, Gemini, both platforms, or No platform."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the generated customer prompts do not contain the audited brand name \"TestSprite\" or the audited domain \"testsprite.com\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the completed report includes Competitor visibility and How to improve your score sections, and that displayed score tones are truthful: below 30 is destructive, 30 through 59 is warning, and 60 through 100 is positive."
+    },
+    {
+      "type": "action",
+      "description": "Resize the browser viewport to approximately 390 pixels wide while remaining on the completed visibility report."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the search form and completed visibility report remain readable without horizontal page overflow, the Website and Your brand fields stack vertically, and report cards use their mobile layout."
+    }
+  ]
+}

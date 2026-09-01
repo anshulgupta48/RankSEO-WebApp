@@ -1,0 +1,133 @@
+{
+  "projectId": "9e2c5bb6-3fed-403d-ad80-877c65de5515",
+  "type": "frontend",
+  "name": "RankSEO pricing and subscription billing",
+  "description": "Verify the signed-out pricing page, authenticated current-plan view, monthly and yearly plan presentation, Better Auth Stripe checkout, subscription synchronization, usage allowances, and Stripe billing portal. Use Stripe test mode only.",
+  "priority": "p0",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Start with a clean signed-out browser session and navigate directly to /pricing."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the public page shows the shared RankSEO header, the label \"Simple, transparent pricing\", the heading \"Grow your visibility in search and AI\", and Free, Pro, and Plus pricing cards."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the signed-out pricing page does not display a \"Your current plan\" card, usage allowance badge, or \"Manage billing\" action."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify Yearly is selected by default and displays Free at $0 per month, Pro at $24 per month with $288 billed yearly, and Plus at $65 per month with $780 billed yearly."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify Pro is marked \"Most popular\" and the public actions read \"Start free\", \"Choose Pro\", and \"Choose Plus\"."
+    },
+    {
+      "type": "action",
+      "description": "Select the Monthly pricing tab."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify monthly pricing updates to $29 per month for Pro and $79 per month for Plus while Free remains $0, and verify the plan feature lists remain visible."
+    },
+    {
+      "type": "action",
+      "description": "Click \"Choose Pro\" on the public pricing page."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the public plan action navigates to /auth/sign-up instead of attempting to open Stripe Checkout for a signed-out visitor."
+    },
+    {
+      "type": "action",
+      "description": "Create a new account using a unique email address, a valid name, and the password \"RankSEO-Test-2026!\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify account creation succeeds and the authenticated dashboard navigation becomes available."
+    },
+    {
+      "type": "action",
+      "description": "Navigate directly to /billing."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the authenticated page displays \"Your current plan\", says the user is currently using RankSEO Free, shows \"Free plan\" and \"No active paid subscription\", and does not show a Manage billing button."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the Free card action is disabled and reads \"Current plan\", while Pro and Plus offer upgrade actions."
+    },
+    {
+      "type": "assertion",
+      "description": "At a desktop viewport wide enough to show the full navbar, verify the usage badge reports 2 keyword searches and 2 visibility scans remaining and an \"Upgrade to Pro\" action is visible."
+    },
+    {
+      "type": "action",
+      "description": "Select Monthly pricing. Configure a temporary browser-level interception for POST /api/auth/subscription/upgrade that returns HTTP 500 with the JSON message \"Deterministic Stripe start failure\", then click \"Upgrade to Pro\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify an error notification is shown, the browser remains on /billing, no paid plan is displayed, and the Upgrade to Pro button becomes usable again after the failed request."
+    },
+    {
+      "type": "action",
+      "description": "Remove the temporary subscription-upgrade interception, select Yearly pricing, and click \"Upgrade to Pro\" once."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify duplicate clicks are prevented while the request starts and the action displays \"Opening Stripe...\" before redirecting to a Stripe-hosted Checkout page."
+    },
+    {
+      "type": "assertion",
+      "description": "Before entering payment details, verify Stripe Checkout is explicitly in test mode, the product is the RankSEO Pro yearly subscription, and the displayed billing amount matches the configured yearly Pro price. If Checkout is not in test mode, stop the test without submitting payment details."
+    },
+    {
+      "type": "action",
+      "description": "In Stripe test mode only, complete Checkout with card number 4242 4242 4242 4242, any future expiry such as 12/34, CVC 123, and valid required billing details. Submit the payment once."
+    },
+    {
+      "type": "action",
+      "description": "Wait for Better Auth's checkout-success synchronization and the redirect back to /billing?checkout=success. Do not refresh or submit Checkout again while synchronization is pending."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the current-plan card now says the user is using RankSEO Pro, displays \"Pro plan\" and \"Active Stripe subscription\", and provides a \"Manage billing\" button."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the Pro card is disabled and reads \"Current plan\", Free reads \"Manage downgrade\", and Plus offers \"Switch to Plus\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the authenticated navbar updates to 100 keyword searches and 25 visibility scans remaining and no longer displays the free-user \"Upgrade to Pro\" action."
+    },
+    {
+      "type": "action",
+      "description": "Click \"Manage billing\" once."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the browser opens a Stripe-hosted customer billing portal for the authenticated test customer and shows subscription-management and payment-method controls."
+    },
+    {
+      "type": "action",
+      "description": "Use the billing portal's return-to-RankSEO action without changing or canceling the subscription."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the browser returns to /billing and the Pro current-plan state remains visible."
+    },
+    {
+      "type": "action",
+      "description": "Resize the browser viewport to approximately 390 pixels wide while on /billing."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the current-plan card, billing-period controls, and all three pricing cards remain readable without horizontal page overflow; cards stack vertically and subscription actions remain accessible."
+    }
+  ]
+}
