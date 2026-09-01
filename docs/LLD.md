@@ -59,6 +59,8 @@ Key fields stored:
 - currentStep
 - triggerRunId
 
+**Note:** Usage limit checking is **now enforced** via `checkUsageLimit()` call.
+
 ### 2.2 AI Visibility API
 
 File: app/api/search-visibility/route.ts
@@ -66,10 +68,14 @@ File: app/api/search-visibility/route.ts
 Flow:
 
 1. Load user session.
-2. Validate website, brand, and topic inputs.
-3. Create a VISIBILITY report record.
-4. Trigger the search-visibility job.
-5. Return a 202 response with run metadata.
+2. Validate website, brand, and topic inputs using Zod.
+3. **Call `checkUsageLimit()` to enforce monthly plan limits.**
+4. Return 403 if the user has exhausted their monthly visibility scans.
+5. Create a VISIBILITY report record.
+6. Trigger the search-visibility job.
+7. Return a 202 response with run metadata.
+
+**Status:** Usage limit enforcement is **active and working** in this route.
 
 ## 3. Background Job Design
 
@@ -229,7 +235,12 @@ Plan limits are defined in lib/plans.ts:
 - pro: 100 keyword searches, 25 visibility scans
 - plus: 500 keyword searches, 100 visibility scans
 
-The idea is to enforce usage caps during report submission.
+Usage limit enforcement status:
+
+- **Keyword Research API**: ✅ Usage limits are enforced via `checkUsageLimit()` call
+- **AI Visibility API**: ✅ Usage limits are enforced via `checkUsageLimit()` call
+
+Both routes now properly check remaining allowance and return 403 if the user has exhausted their monthly limit.
 
 ## 8. Error Handling Strategy
 

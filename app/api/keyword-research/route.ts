@@ -6,6 +6,7 @@ import { auth } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { ReportStatus } from '@/generated/prisma/client';
 import type { keywordResearchTask } from '@/trigger/keyword-research';
+import { checkUsageLimit } from '@/lib/billing';
 
 const keywordResearchInputSchema = z.object({
   keyword: z.string().trim().min(2).max(120),
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const usage = { allowed: true };
+  const usage = await checkUsageLimit(session.user.id, 'keywordSearches');
   if (!usage.allowed) {
     return NextResponse.json(
       {

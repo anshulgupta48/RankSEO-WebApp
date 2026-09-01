@@ -200,8 +200,9 @@ npm run trigger:dev
 
 ## Documentation
 
-- [docs/HLD.md](docs/HLD.md)
-- [docs/LLD.md](docs/LLD.md)
+- [docs/HLD.md](docs/HLD.md) - High-level system architecture
+- [docs/LLD.md](docs/LLD.md) - Low-level component details
+- [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) - Beginner-friendly flowcharts & explanations
 
 ## Notes
 

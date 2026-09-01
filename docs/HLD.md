@@ -131,7 +131,7 @@ The app integrates with external services:
 - Protected dashboard routes redirect unauthenticated users.
 - API routes require a valid session for authenticated actions.
 - Report data is scoped by userId to avoid cross-user access.
-- Billing limits are enforced per user and plan.
+- Billing limits are enforced per user and plan on both keyword research and visibility scan endpoints.
 
 ## 7. Failure Handling
 
