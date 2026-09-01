@@ -108,6 +108,7 @@ flowchart LR
 - Google Gemini AI SDK
 - Bright Data API
 - TanStack React Query
+- TestSprite E2E automation
 
 ## Project Structure
 
@@ -198,11 +199,22 @@ npx prisma studio
 npm run trigger:dev
 ```
 
+## Quality Assurance & Automation
+
+RankSEO uses TestSprite for end-to-end validation of the most important user flows, especially authentication, AI search visibility, and the live report experience.
+
+- The repo includes a dedicated frontend plan in [testsprite/plans/ai-search-visibility.plan.json](testsprite/plans/ai-search-visibility.plan.json)
+- The verification workflow and repo guidance are documented in [AGENTS.md](AGENTS.md)
+- The plan covers signup, form validation, failure handling, live progress, and completed report assertions
+
+This gives the team a repeatable way to validate critical product journeys without relying only on manual QA.
+
 ## Documentation
 
 - [docs/HLD.md](docs/HLD.md) - High-level system architecture
 - [docs/LLD.md](docs/LLD.md) - Low-level component details
 - [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) - Beginner-friendly flowcharts & explanations
+- [testsprite/plans/ai-search-visibility.plan.json](testsprite/plans/ai-search-visibility.plan.json) - Automated end-to-end validation plan
 
 ## Notes
 

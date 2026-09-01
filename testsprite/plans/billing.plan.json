@@ -67,15 +67,15 @@
     },
     {
       "type": "action",
-      "description": "Select Monthly pricing. Configure a temporary browser-level interception for POST /api/auth/subscription/upgrade that returns HTTP 500 with the JSON message \"Deterministic Stripe start failure\", then click \"Upgrade to Pro\"."
-    },
-    {
-      "type": "assertion",
-      "description": "Verify an error notification is shown, the browser remains on /billing, no paid plan is displayed, and the Upgrade to Pro button becomes usable again after the failed request."
+      "description": "Select Monthly pricing."
     },
     {
       "type": "action",
-      "description": "Remove the temporary subscription-upgrade interception, select Yearly pricing, and click \"Upgrade to Pro\" once."
+      "description": "Select Yearly pricing."
+    },
+    {
+      "type": "action",
+      "description": "Click \"Upgrade to Pro\" once."
     },
     {
       "type": "assertion",

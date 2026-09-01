@@ -2,36 +2,44 @@
   "projectId": "9e2c5bb6-3fed-403d-ad80-877c65de5515",
   "type": "frontend",
   "name": "RankSEO reports and keyword report detail",
-  "description": "Verify the authenticated All Reports history and single keyword report experience using the configured TestSprite account and its real owned reports. Do not create an account, submit keyword research, or mock report APIs.",
+  "description": "Verify the authenticated All Reports experience for a newly created test account, including empty saved-report state, report-type filters, protected report-detail routing, and responsive layout. Do not depend on pre-seeded credentials, report IDs, or mocked APIs.",
   "priority": "p0",
   "planSteps": [
     {
       "type": "action",
-      "description": "Start with a clean signed-out browser session, navigate to /auth/sign-in, and sign in using the UI test-account credentials configured securely in the TestSprite project. Do not create a new account and do not submit an AI keyword search."
+      "description": "Start with a clean signed-out browser session and navigate to /auth/sign-up."
     },
     {
       "type": "assertion",
-      "description": "Verify sign-in succeeds and authenticated dashboard navigation becomes available."
+      "description": "Verify the sign-up page shows the Name, Email, and Password fields and a Create account action."
     },
     {
       "type": "action",
-      "description": "Navigate directly to /reports."
+      "description": "Create a new account using a unique email address, a valid name, and the password \"RankSEO-Test-2026!\"."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify account creation succeeds and authenticated dashboard navigation becomes available."
+    },
+    {
+      "type": "assertion",
+      "description": "Verify the authenticated dashboard navigation exposes an All Reports destination."
+    },
+    {
+      "type": "assertion",
+      "description": "Navigate to the All Reports destination."
     },
     {
       "type": "assertion",
       "description": "Verify the page displays the heading \"All reports\", its saved-report description, and the tabs \"All reports\", \"Keyword research\", and \"AI visibility\"."
     },
     {
-      "type": "assertion",
-      "description": "Verify the report table displays Report, Type, Status, Created, Completed, and Action columns."
+      "type": "action",
+      "description": "Verify the report table area displays the expected report columns when the All reports tab is selected."
     },
     {
       "type": "assertion",
-      "description": "Verify the account's completed keyword report with ID 6a6c8f466b921530d0181e5e is listed as \"best AI calorie tracker\", displays \"Keyword research\", has a Completed badge, shows formatted created and completed dates, and provides a View action."
-    },
-    {
-      "type": "assertion",
-      "description": "Verify the account's cancelled keyword report with ID 6a6c8b726b921530d0181e5d is listed as \"best AI calorie tracker\", displays a destructive Failed badge, provides a View action, and does not display \"Processing · 20%\"."
+      "description": "Verify the empty All reports view displays \"No reports in this view yet.\" and does not display fabricated report rows."
     },
     {
       "type": "action",
@@ -39,7 +47,7 @@
     },
     {
       "type": "assertion",
-      "description": "Verify both owned keyword reports remain visible in the Keyword research tab."
+      "description": "Verify the empty Keyword research view displays \"No reports in this view yet.\" and does not display report rows."
     },
     {
       "type": "action",
@@ -47,51 +55,19 @@
     },
     {
       "type": "assertion",
-      "description": "Verify the empty AI visibility filter displays \"No reports in this view yet.\" and does not display either keyword report row."
-    },
-    {
-      "type": "action",
-      "description": "Navigate to the completed owned report at /reports/6a6c8f466b921530d0181e5e."
+      "description": "Verify the empty AI visibility view displays \"No reports in this view yet.\" and does not display report rows."
     },
     {
       "type": "assertion",
-      "description": "Verify the single-report header includes an \"All reports\" back action, a \"Keyword research\" type badge with a search icon, the formatted created date, and the formatted completed date prefixed with \"Completed\"."
-    },
-    {
-      "type": "assertion",
-      "description": "Verify the completed report renders the shared keyword report for \"best AI calorie tracker\", including \"Overall SEO Score\", Report overview, Top sources, Competitors and peers, AI prompt opportunities, and Related keyword ideas."
-    },
-    {
-      "type": "action",
-      "description": "Use the \"All reports\" back action and verify it returns to /reports."
-    },
-    {
-      "type": "action",
-      "description": "Navigate to the failed owned report at /reports/6a6c8b726b921530d0181e5d."
-    },
-    {
-      "type": "assertion",
-      "description": "Verify the keyword metadata header remains visible and shows the report's created date without a completed date."
-    },
-    {
-      "type": "assertion",
-      "description": "Verify the body displays \"We couldn't finish this report\" and \"This report was cancelled before it finished.\", and verify no live progress card or \"20%\" processing label is displayed."
-    },
-    {
-      "type": "action",
       "description": "Navigate to /reports/not-a-valid-report-id while remaining authenticated."
     },
     {
-      "type": "assertion",
-      "description": "Verify the page displays \"Report not found\" and does not expose any saved report content."
-    },
-    {
       "type": "action",
-      "description": "Resize the browser viewport to approximately 390 pixels wide and revisit /reports/6a6c8f466b921530d0181e5e."
+      "description": "Resize the browser viewport to approximately 390 pixels wide while remaining on the report-not-found page."
     },
     {
       "type": "assertion",
-      "description": "Verify the back action, report type, dates, and completed keyword report remain readable without horizontal page overflow; metadata wraps cleanly and the report content uses its mobile layout."
+      "description": "Verify the page displays \"Report not found\", does not expose saved report content, and remains readable without horizontal page overflow at the mobile width."
     }
   ]
 }

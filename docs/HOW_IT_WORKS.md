@@ -299,6 +299,32 @@ api/
 
 ---
 
+## Quality Gates and TestSprite
+
+This product is not only built for live production usage; it also includes automated validation for the most critical user journeys.
+
+```mermaid
+flowchart LR
+    U[User journey] --> AUTH[Sign-up / sign-in]
+    AUTH --> V[Validation checks]
+    V --> JOB[Live AI workflow]
+    JOB --> REPORT[Completed report]
+    REPORT --> T[TestSprite E2E assertions]
+    T --> QA[Regression protection]
+```
+
+The repo includes a dedicated TestSprite plan for the AI Search Visibility flow at [../testsprite/plans/ai-search-visibility.plan.json](../testsprite/plans/ai-search-visibility.plan.json). That plan verifies:
+
+- account creation and authenticated access
+- landing-state rendering and form validation
+- deterministic API failure handling
+- live progress updates during scanning
+- final report accuracy and responsive layout checks
+
+This complements the app’s manual QA and helps catch regressions in the report-generation pipeline before they reach production.
+
+---
+
 ## Signup Flow
 
 ```mermaid

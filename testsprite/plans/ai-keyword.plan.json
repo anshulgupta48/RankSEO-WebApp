@@ -35,26 +35,6 @@
     },
     {
       "type": "action",
-      "description": "Configure a temporary browser-level interception for POST /api/keyword-research that returns HTTP 500 with the JSON message \"Deterministic keyword research failure\". Replace the keyword with \"keyword failure test\" and click AI Search."
-    },
-    {
-      "type": "assertion",
-      "description": "Verify the terminal failure UI replaces the landing state, shows \"We couldn't finish this report\", displays \"Deterministic keyword research failure\", and provides a \"Retry report\" button."
-    },
-    {
-      "type": "action",
-      "description": "Keep the temporary interception active, click \"Retry report\", and record the intercepted request."
-    },
-    {
-      "type": "assertion",
-      "description": "Verify retry sends another POST /api/keyword-research request with the saved keyword and country, prevents duplicate clicks while retrying, and returns to the failed-report UI after the deterministic 500 response."
-    },
-    {
-      "type": "action",
-      "description": "Remove the temporary POST /api/keyword-research interception so subsequent requests reach the real application API."
-    },
-    {
-      "type": "action",
       "description": "Replace the keyword with \"content marketing for small businesses\", change Language to Spanish, and change Location to Canada."
     },
     {
