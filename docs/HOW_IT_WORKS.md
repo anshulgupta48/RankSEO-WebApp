@@ -152,13 +152,17 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    A["User Signs Up<br/>email: john@ex.com<br/>password: secret123"] -->|Better Auth| B["Hash password<br/>securely"]
-    B -->|Store in DB| C["User document<br/>password: hashed_xyz"]
-    D["Create session"] -->|Generate token| E["Session document<br/>token: secure_abc"]
-    E -->|Store in browser| F["Cookie<br/>sessionToken=abc"]
+  A["Sign-up form<br/>SignUpForm.tsx"] -->|authClient.signUp.email| B["POST /api/auth/sign-up/email"]
+  B -->|Catch-all handler| C["app/api/auth/[...all]/route.ts"]
+  C -->|Delegates| D["Better Auth instance<br/>lib/auth.ts"]
+  D -->|Hash password| E["Create User document"]
+  E -->|Create records| F["Session + Account + Subscription"]
+  F -->|Set cookie| G["Browser session cookie"]
 
-    G["User logs in"] -->|Check cookie| H["Verify token"]
-    H -->|Valid?| I["Load user session<br/>Grant access"]
+  H["Sign-in form<br/>SignInForm.tsx"] -->|authClient.signIn.email| B
+  G -->|Sent with later request| I["auth.api.getSession()"]
+  I -->|Valid session| J["Protected API continues"]
+  I -->|Missing or expired| K["401 Unauthorized"]
 ```
 
 **In RankSEO**:
@@ -167,6 +171,52 @@ flowchart TD
 - Creates sessions so browser remembers you're logged in
 - Checks session on every API request
 - Rejects requests without valid session (401 Unauthorized)
+- `lib/auth.ts` initializes Better Auth with the Prisma MongoDB adapter and enables email/password authentication.
+- `app/api/auth/[...all]/route.ts` is the only app-owned auth route. It exports `GET` and `POST` from `toNextJsHandler(auth)`.
+- The app does not hand-write separate sign-up, sign-in, or sign-out route handlers. Better Auth maps those operations under `/api/auth/*`.
+- `lib/auth-client.ts` exposes the browser client used by `SignUpForm`, `SignInForm`, and logout controls.
+- Server code calls `auth.api.getSession({ headers })` to turn the session cookie into the authenticated user.
+- `proxy.ts` checks the session for `/` and `/auth/*` and redirects already signed-in users to `/ai-keyword`. API routes perform their own authorization checks.
+
+### Authentication API ownership
+
+```mermaid
+flowchart LR
+  UI["React auth form"] --> CLIENT["lib/auth-client.ts"]
+  CLIENT --> ROUTE["/api/auth/*"]
+  ROUTE --> HANDLER["toNextJsHandler(auth)"]
+  HANDLER --> CORE["Better Auth core"]
+  CORE --> ADAPTER["Prisma adapter"]
+  ADAPTER --> DB[("MongoDB")]
+  CORE --> COOKIE["Set or clear session cookie"]
+  COOKIE --> UI
+```
+
+The important distinction is that `/api/auth` is an integration boundary, not a custom controller containing every auth operation. Better Auth owns the protocol, password hashing, session creation, cookie handling, and database writes after the route delegates the request to it.
+
+### Authentication session check for protected features
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant R as Feature API route
+  participant A as Better Auth
+  participant M as Prisma/MongoDB
+
+  B->>R: Request with session cookie
+  R->>A: auth.api.getSession(headers)
+  A->>M: Read session and user
+  M-->>A: Valid session or no match
+  alt Session is valid
+    A-->>R: User identity
+    R-->>B: Continue feature request
+  else Session is missing or expired
+    A-->>R: null
+    R-->>B: 401 Unauthorized
+  end
+```
+
+The feature routes then apply feature-specific validation and billing checks. Authentication proves who the user is; it does not by itself grant unlimited access.
 
 ---
 
@@ -176,18 +226,75 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["User clicks<br/>Upgrade to Pro"] -->|Stripe| B["Payment Dialog<br/>Enter card details"]
-    B -->|Tokenized payment| C["Stripe Servers<br/>Process payment"]
-    C -->|Success| D["Stripe Webhook<br/>notifies our server"]
-    D -->|Prisma| E["Update subscription<br/>plan: 'pro'<br/>status: 'active'"]
-    E -->|TanStack Query| F["React updates<br/>show Pro features"]
+  A["User selects Pro or Plus"] -->|authClient.subscription.upgrade| B["Better Auth Stripe plugin"]
+  B -->|Creates or updates checkout/subscription| C["Stripe Checkout / Billing"]
+  C -->|Customer pays| D["Stripe processes payment"]
+  D -->|POST signed event| E["/api/auth/stripe/webhook"]
+  E -->|Catch-all auth handler| F["Better Auth Stripe plugin"]
+  F -->|Verify STRIPE_WEBHOOK_SECRET| G["Interpret subscription event"]
+  G -->|Write subscription state| H["MongoDB subscriptions document"]
+  H -->|Next billing status request| I["getBillingStatus()"]
+  I -->|Plan + usage limits| J["Billing UI and feature gates"]
 ```
 
 **In RankSEO**:
 
-- Better Auth has Stripe plugin built-in
-- User pays → Stripe confirms → We update plan in DB
-- Billing status shows usage limits per plan
+- Stripe is configured inside `lib/auth.ts` through the Better Auth Stripe plugin.
+- The server supplies `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` to the plugin.
+- The configured plans are `pro` and `plus`, each with monthly and annual price IDs from environment variables.
+- The pricing UI calls `authClient.subscription.upgrade()` for paid plans and `authClient.subscription.billingPortal()` when the user manages or leaves a subscription.
+- There is no standalone `app/api/billing/checkout/route.ts` or `app/api/billing/webhook/route.ts` in this repository.
+- The webhook endpoint is generated by the Stripe plugin at `/stripe/webhook` and is exposed through the catch-all auth route as `/api/auth/stripe/webhook`.
+- Stripe sends signed subscription events to that URL. Better Auth verifies the signature and synchronizes the subscription record through the Prisma adapter.
+- `getBillingStatus()` reads the active subscription and counts the user’s reports to calculate plan limits and remaining usage.
+- Keyword and visibility APIs call `checkUsageLimit()` before creating a report, so billing enforcement happens on the server rather than only in the UI.
+
+### Stripe payment and webhook lifecycle
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant P as PricingSection
+  participant AC as Better Auth client
+  participant S as Stripe
+  participant WH as /api/auth/stripe/webhook
+  participant DB as MongoDB
+  participant API as RankSEO feature API
+
+  U->>P: Select Pro or Plus and billing interval
+  P->>AC: subscription.upgrade(plan, annual)
+  AC->>S: Start checkout or subscription change
+  S-->>U: Hosted payment flow
+  U->>S: Submit payment details
+  S->>WH: Signed subscription event
+  WH->>WH: Verify webhook signature
+  WH->>DB: Create or update subscription
+  S-->>P: Return to /billing?checkout=success
+  P->>AC: Request current billing status
+  AC->>DB: Read active subscription through Better Auth
+  DB-->>P: Plan, status, period, limits
+  API->>DB: Count reports for usage
+  API-->>U: Allow or reject new analysis
+```
+
+The browser redirect is useful for navigation, but it is not the source of truth for payment success. The signed webhook is what allows the server to synchronize subscription state even when the user closes the checkout page or returns later.
+
+### Stripe-related data flow
+
+```mermaid
+flowchart LR
+  ENV["Stripe price IDs<br/>and webhook secret"] --> AUTH["lib/auth.ts"]
+  AUTH --> PLUGIN["Better Auth Stripe plugin"]
+  PLUGIN --> SUB[("subscriptions")]
+  USER["Authenticated user"] --> SUB
+  SUB --> STATUS["getBillingStatus()"]
+  REPORTS[("reports")] --> COUNT["Usage counts"]
+  STATUS --> GATE["checkUsageLimit()"]
+  COUNT --> GATE
+  GATE --> DECISION{"Remaining quota?"}
+  DECISION -->|Yes| JOB["Create report and start job"]
+  DECISION -->|No| BLOCK["403 LIMIT_REACHED"]
+```
 
 ---
 
@@ -441,7 +548,7 @@ flowchart TD
     B -->|Monthly or Yearly| C["Enter card<br/>details"]
     C -->|Process payment| D["Stripe API<br/>validates card"]
     D -->|Success| E["Stripe sends<br/>webhook to<br/>our server"]
-    E -->|Trigger.dev or<br/>direct handler| F["Better Auth<br/>receives webhook"]
+    E -->|POST /api/auth/stripe/webhook| F["Better Auth Stripe plugin<br/>verifies signature"]
     F -->|Update DB| G["Change subscription<br/>plan to PRO"]
     G -->|TanStack Query| H["React updates<br/>Show Pro limits"]
 ```
@@ -848,8 +955,8 @@ const reportQuery = useQuery({
   refetchInterval: (query) => {
     const status = query.state.data?.report.status;
 
-    // If job is done, stop polling
-    if (status === 'COMPLETED' || status === 'FAILED') {
+    // The API maps database statuses to lowercase UI statuses.
+    if (status === 'completed' || status === 'failed') {
       return false;
     }
 
@@ -862,7 +969,7 @@ const reportQuery = useQuery({
 // Every 3 seconds → fetches report → checks status
 // When status changes → React re-renders
 // User sees: progress bar moving, currentStep updating
-// When COMPLETED → stop polling → show final report
+// When completed → stop polling → show final report
 ```
 
 ---
