@@ -283,7 +283,7 @@ async function generateVisibilityPrompts({
   topic: string;
 }) {
   const { output } = await generateText({
-    model: google('gemini-3.6-flash'),
+    model: google('gemini-3.5-flash-lite'),
     output: Output.object({
       schema: visibilityPromptPlanSchema,
       name: 'visibilityPromptPlan',
@@ -409,7 +409,7 @@ async function generateVisibilityReport({
 }): Promise<VisibilityReportResult> {
   const websiteHost = new URL(website).hostname.replace(/^www\./, '');
   const { output } = await generateText({
-    model: google('gemini-3.6-flash'),
+    model: google('gemini-3.5-flash-lite'),
     output: Output.object({
       schema: visibilityReportSchema,
       name: 'aiSearchVisibilityReport',

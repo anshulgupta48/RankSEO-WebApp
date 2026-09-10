@@ -415,7 +415,7 @@ async function generateReport({
   });
 
   const { output } = await generateText({
-    model: google('gemini-3.6-flash'),
+    model: google('gemini-3.5-flash-lite'),
     output: Output.object({
       schema: keywordReportSchema,
       name: 'keywordSeoReport',
