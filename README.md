@@ -1,4 +1,4 @@
-# RankSEO
+# RankSEO 
 
 AI-powered SEO intelligence for keyword opportunity and AI brand visibility.
 
